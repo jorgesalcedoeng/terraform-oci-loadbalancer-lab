@@ -9,3 +9,11 @@ output "public_subnet_id" {
 output "private_subnet_id" {
   value = oci_core_subnet.private_subnet.id
 }
+
+output "public_nsg_id" {
+  value = oci_core_network_security_group.public_nsg.id
+}
+
+output "private_nsg_id" {
+  value = oci_core_network_security_group.private_nsg.id
+}
