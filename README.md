@@ -70,29 +70,58 @@ Balancer público** distribuye tráfico entre **dos servidores Nginx**.
 
 # 📂 Estructura del Proyecto
 
-    terraform-oci-loadbalancer-lab/
-    │
-    ├── main.tf
-    ├── outputs.tf
-    │
-    ├── modules
-    │   │
-    │   ├── network
-    │   │   ├── vcn.tf
-    │   │   ├── subnets.tf
-    │   │   ├── gateways.tf
-    │   │   ├── routes.tf
-    │   │   └── outputs.tf
-    │   │
-    │   └── compute
-    │       ├── loadbalancer.tf
-    │       ├── data.tf
-    │       ├── variables.tf
-    │       ├── outputs.tf
-    │       └── user_data.yaml
+El proyecto sigue una **estructura modular de Terraform**, separando la infraestructura de red y la capa de cómputo en módulos reutilizables.
 
-Esta estructura modular permite **reutilizar componentes y mantener el
-código organizado**.
+```
+terraform-oci-loadbalancer-lab/
+│
+├── main.tf
+├── provider.tf
+├── versions.tf
+├── variables.tf
+├── terraform.tfvars
+├── outputs.tf
+├── README.md
+│
+├── oci-lab
+├── oci-lab.pub
+│
+└── modules
+    │
+    ├── network
+    │   ├── vcn.tf
+    │   ├── subnets.tf
+    │   ├── gateways.tf
+    │   ├── routes.tf
+    │   ├── nsg.tf
+    │   ├── sl.tf
+    │   ├── flow_logs.tf
+    │   ├── variables.tf
+    │   └── outputs.tf
+    │
+    └── compute
+        ├── vm.tf
+        ├── loadbalancer.tf
+        ├── data.tf
+        ├── variables.tf
+        ├── outputs.tf
+        └── user_data.yaml
+```
+
+## Descripción de los componentes
+
+| Componente | Descripción |
+|------------|-------------|
+| `main.tf` | Punto de entrada del proyecto Terraform donde se llaman los módulos |
+| `provider.tf` | Configuración del provider de Oracle Cloud Infrastructure |
+| `versions.tf` | Definición de versiones de Terraform y providers |
+| `variables.tf` | Declaración de variables globales |
+| `terraform.tfvars` | Valores de variables utilizados en el despliegue |
+| `outputs.tf` | Outputs del despliegue principal |
+| `oci-lab / oci-lab.pub` | Claves SSH utilizadas para acceder a las instancias |
+| `modules/network` | Módulo que crea la infraestructura de red (VCN, subnets, gateways, NSG) |
+| `modules/compute` | Módulo encargado de desplegar las instancias compute y el Load Balancer |
+| `user_data.yaml` | Script de `cloud-init` que instala y configura Nginx automáticamente |
 
 ------------------------------------------------------------------------
 
