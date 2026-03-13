@@ -98,34 +98,61 @@ código organizado**.
 
 # ⚙️ Variables principales
 
-  Variable              Descripción
-  --------------------- ------------------------------
-  compartment_ocid      OCID del compartment
-  vcn_cidr              CIDR de la VCN
-  public_subnet_cidr    CIDR de la subred pública
-  private_subnet_cidr   CIDR de la subred privada
-  instance_shape        Shape de las instancias
-  instance_image        Imagen del sistema operativo
+Las siguientes variables permiten parametrizar el laboratorio para adaptarlo a distintos entornos dentro de OCI.
+
+| Variable | Descripción | Ejemplo |
+|--------|-------------|--------|
+| `compartment_ocid` | OCID del compartment donde se desplegarán los recursos | `ocid1.compartment...` |
+| `vcn_cidr` | Rango CIDR de la Virtual Cloud Network | `10.0.0.0/16` |
+| `public_subnet_cidr` | CIDR de la subred pública donde se despliega el Load Balancer | `10.0.1.0/24` |
+| `private_subnet_cidr` | CIDR de la subred privada donde se despliegan las instancias | `10.0.2.0/24` |
+| `instance_shape` | Shape de las instancias compute | `VM.Standard.E2.1.Micro` |
+| `instance_image` | Imagen del sistema operativo utilizada para las VMs | `Oracle Linux` |
+
+Estas variables pueden definirse en un archivo `terraform.tfvars` o mediante variables de entorno.
 
 ------------------------------------------------------------------------
 
 # ⚖️ Load Balancer
 
-Configuración principal del balanceador:
+# ⚖️ Load Balancer
 
-  Configuración   Valor
-  --------------- ----------------------
-  Tipo            Public Load Balancer
-  Shape           Flexible
-  Listener        HTTP
-  Puerto          80
-  Política        Round Robin
+El laboratorio implementa un **OCI Public Load Balancer** que distribuye tráfico HTTP hacia dos instancias compute que ejecutan Nginx.
 
-### Health Check
+El balanceador se despliega en la **subred pública**, mientras que las instancias backend se encuentran en la **subred privada**, lo cual es una práctica común para mejorar la seguridad de la arquitectura.
 
-    Protocol: HTTP
-    Port: 80
-    Path: /
+## Configuración principal
+
+| Configuración | Valor |
+|---------------|------|
+| Tipo | Public Load Balancer |
+| Shape | Flexible |
+| Bandwidth | 10 – 100 Mbps |
+| Listener | HTTP |
+| Puerto | 80 |
+| Política de balanceo | Round Robin |
+
+## Backend Set
+
+El backend set registra las instancias compute como servidores backend que recibirán tráfico del balanceador.
+
+| Backend | Puerto |
+|--------|------|
+| VM1 | 80 |
+| VM2 | 80 |
+
+## Health Check
+
+El Load Balancer utiliza un **Health Check HTTP** para verificar que los servidores backend estén disponibles.
+
+Protocol: HTTP
+Port: 80
+Path: /
+Interval: 10s
+Timeout: 3s
+Retries: 3
+
+Si una instancia no responde correctamente al health check, el Load Balancer dejará de enviar tráfico a esa VM hasta que vuelva a estar disponible.
 
 ------------------------------------------------------------------------
 
@@ -171,18 +198,10 @@ terraform apply
 
 # 🧪 Prueba del laboratorio
 
-1.  Obtener la **IP pública del Load Balancer**
-2.  Abrir el navegador
+Una vez que la infraestructura ha sido desplegada correctamente, se puede validar el funcionamiento del balanceador.
 
-```{=html}
-<!-- -->
-```
-    http://LOAD_BALANCER_IP
-
-3.  Refrescar varias veces
-
-El **hostname del servidor cambiará**, demostrando que el balanceador
-distribuye tráfico.
+## Paso 1 — Obtener la IP pública del Load Balancer
+http://LOAD_BALANCER_IP
 
 ------------------------------------------------------------------------
 
