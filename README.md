@@ -70,7 +70,7 @@ Balancer público** distribuye tráfico entre **dos servidores Nginx**.
 
 # 📂 Estructura del Proyecto
 
-    oci-3tier/
+    terraform-oci-loadbalancer-lab/
     │
     ├── main.tf
     ├── outputs.tf
