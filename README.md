@@ -144,8 +144,6 @@ Estas variables pueden definirse en un archivo `terraform.tfvars` o mediante var
 
 # ⚖️ Load Balancer
 
-# ⚖️ Load Balancer
-
 El laboratorio implementa un **OCI Public Load Balancer** que distribuye tráfico HTTP hacia dos instancias compute que ejecutan Nginx.
 
 El balanceador se despliega en la **subred pública**, mientras que las instancias backend se encuentran en la **subred privada**, lo cual es una práctica común para mejorar la seguridad de la arquitectura.
